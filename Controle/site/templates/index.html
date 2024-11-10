@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Produtos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+
+<h1>Controle de Produtos</h1>
+
+<h2>Adicionar Produto</h2>
+<form id="produtoForm">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required><br><br>
+
+    <label for="valor">Valor:</label>
+    <input type="text" id="valor" name="valor" required><br><br>
+
+    <label for="tipo">Tipo:</label>
+    <input type="text" id="tipo" name="tipo" required><br><br>
+
+    <label for="descricao">Descrição:</label>
+    <input type="text" id="descricao" name="descricao" required><br><br>
+
+    <button type="submit">Adicionar Produto</button>
+</form>
+
+<h2>Lista de Produtos</h2>
+<table id="produtosTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Valor</th>
+      <th>Tipo</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- carregar produtos aqui -->
+  </tbody>
+</table>
+
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>
