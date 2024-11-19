@@ -22,23 +22,32 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = document.querySelector('#emailLogin').value;
         const senha = document.querySelector('#senhaLogin').value;
 
-        const usuarioLogin = { email, senha };
-
-        fetch('/login', {
+        fetch('/usuarios/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(usuarioLogin)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Login bem-sucedido!');
-                    window.location.href = data.redirectUrl;
-                } else {
-                    alert('Usuario ou senha invalidos');
-                }
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                senha: senha
             })
-            .catch(error => console.error('Erro ao fazer login:', error));
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();            
+            } else {
+                throw new Error('Erro ao fazer login');
+            }
+        })
+        .then(data => {
+            console.log('Login bem-sucedido:', data);
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao fazer login:', error);
+        });
     });
 
 
@@ -52,19 +61,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const novoUsuario = { nome, email, senha, tipo };
 
-        fetch('/usuarios', {
+        fetch('/usuarios/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(novoUsuario)
         })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                if (data.success) {
-                    loginFormContainer.style.display = 'block';
-                    cadastroFormContainer.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Erro ao cadastrar usuário:', error));
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                loginFormContainer.style.display = 'block';
+                cadastroFormContainer.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Erro ao cadastrar usuário:', error));
     });
 });

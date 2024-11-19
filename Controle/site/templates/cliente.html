@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Produtos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
+</head>
+<body>
+    <h1>Lista de Produtos</h1>
+    <table border="1" id="produtosTabela">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Valor (R$)</th>
+                <th>Descrição</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Conteúdo será inserido dinamicamente -->
+        </tbody>
+    </table>
+
+    <!-- Botão para visualizar o carrinho -->
+    <button onclick="window.location.href='/cliente/carrinho'">Ver Carrinho</button>
+
+    <script src="/static/js/cliente.js"></script>
+</body>
+</html>
