@@ -1,113 +1,102 @@
 from flask import Flask, request, jsonify, render_template, Blueprint
-import pyodbc
+from database import SessionLocal
+from models import Produto
 
 produtos_bp = Blueprint('produtos', __name__)
 app = Flask(__name__)
 
-
-
-def get_db_connection():
-    database = 'CONTROLE'
-    username = 'sa'
-    password = 'impacta1'
-    connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER=DESKTOP-075BAM7\\SQLEXPRESS;DATABASE={database};UID={username};PWD={password}'
-    conn = pyodbc.connect(connection_string)
-    return conn
-
-
 @produtos_bp.route('/')
-def index():
+def produtos():
     return render_template('produtos.html')
+
 
 @produtos_bp.route('/', methods=['POST'])
 def adicionar_produto():
     try:
         data = request.json
-        nome = data['nome']
-        valor = data['valor']
-        tipo = data['tipo']
-        descricao = data['descricao']
-        quantidade = data['quantidade']
+        session = SessionLocal()
+        novo_produto = Produto(
+            nome = data['nome'],
+            valor = data['valor'],
+            tipo = data['tipo'],
+            descricao = data['descricao'],
+            quantidade = data['quantidade']
+        )
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO Produtos (Nome, Valor, Tipo, Descricao, Quantidade)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (nome, valor, tipo, descricao, quantidade))
-        conn.commit()
-        conn.close()
+        session.add(novo_produto)
+        session.commit()
+        session.close()
 
         return jsonify({'message': 'Produto adicionado com sucesso!'}), 201
-    except pyodbc.Error as e:
-        return jsonify({'error': 'Erro ao conectar ao banco de dados.', 'details': str(e)}), 500
     except Exception as e:
         return jsonify({'error': 'Erro ao adicionar produto.', 'details': str(e)}), 500
+
 
 
 @produtos_bp.route('/listar', methods=['GET'])
 def listar_produtos():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM Produtos')
-        produtos = cursor.fetchall()
+        session = SessionLocal()
+        produtos = session.query(Produto).all()
+        session.close()
 
         produtos_lista = []
         for produto in produtos:
             produtos_lista.append({
-                'id': produto[0],
-                'nome': produto[1],
-                'valor': produto[2],
-                'tipo': produto[3],
-                'descricao': produto[4],
-                'quantidade': produto[5]
+                'id': produto.id,
+                'nome': produto.nome,
+                'valor': produto.valor,
+                'tipo': produto.tipo,
+                'descricao': produto.descricao,
+                'quantidade': produto.quantidade
             })
-        conn.close()
         return jsonify({'produtos': produtos_lista})
     except Exception as e:
         return jsonify({'error': 'Erro ao listar produtos.', 'details': str(e)}), 500
 
 
-@produtos_bp.route('/<int:id>', methods=['PUT'])
-def atualizar_produto(id):
+@produtos_bp.route('/<int:produto_id>', methods=['PUT'])
+def atualizar_produto(produto_id):
     try:
         data = request.json
-        nome = data['nome']
-        valor = data['valor']
-        tipo = data['tipo']
-        descricao = data['descricao']
-        quantidade = data['quantidade']
+        session = SessionLocal()
+        produto = session.query(Produto).filter(Produto.id == produto_id).first()
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            UPDATE Produtos
-            SET Nome = ?, Valor = ?, Tipo = ?, Descricao = ?, Quantidade = ?
-            WHERE Id = ?
-        ''', (nome, valor, tipo, descricao, quantidade, id))
-        conn.commit()
-        conn.close()
+        if produto:
+            produto.nome = data.get('nome', produto.nome)
+            produto.valor = data.get('valor', produto.valor)
+            produto.tipo = data.get('tipo', produto.tipo)
+            produto.descricao = data.get('descricao', produto.descricao)
+            produto.quantidade = data.get('quantidade', produto.quantidade)
 
-        return jsonify({"message": "Produto atualizado com sucesso!"}), 200
+            session.commit()
+            session.close()
+
+            return jsonify({'message': 'Produto atualizado com sucesso!'}), 200
+        else:
+            session.close()
+            return jsonify({'error': 'Produto não encontrado.'}), 404
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': 'Erro ao atualizar produto.', 'details': str(e)}), 500
 
-@produtos_bp.route('/<int:id>', methods=['DELETE'])
-def deletar_produto(id):
+
+@produtos_bp.route('/<int:produto_id>', methods=['DELETE'])
+def deletar_produto(produto_id):
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM Produtos WHERE Id = ?", (id,))
-        conn.commit()
+        session = SessionLocal()
+        produto = session.query(Produto).filter(Produto.id == produto_id).first()
 
-        if cursor.rowcount == 0:
-            return jsonify({"message": "Produto não encontrado."}), 404
+        if produto:
+            session.delete(produto)
+            session.commit()
+            session.close()
 
-        return jsonify({"message": f"Produto {id} deletado com sucesso!"}), 200
+            return jsonify({'message': 'Produto deletado com sucesso!'}), 200
+        else:
+            session.close()
+            return jsonify({'error': 'Produto não encontrado.'}), 404
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        return jsonify({'error': 'Erro ao deletar produto.', 'details': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

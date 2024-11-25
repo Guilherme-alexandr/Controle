@@ -186,3 +186,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   listarProdutos();
 });
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+
+  sessionStorage.clear();
+  window.location.href = '/usuarios/';
+});

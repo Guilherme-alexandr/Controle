@@ -62,3 +62,9 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = '/cliente';
     });
 });
+
+document.getElementById('voltar').addEventListener('click', function() {
+
+    sessionStorage.clear();
+    window.location.href = '/cliente/';
+});

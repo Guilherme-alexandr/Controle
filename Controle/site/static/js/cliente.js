@@ -64,3 +64,9 @@ function adicionarAoCarrinho(produto, quantidade) {
     localStorage.setItem('carrinho', JSON.stringify(carrinho));
     alert('Produto adicionado ao carrinho com sucesso!');
 }
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+
+    sessionStorage.clear();
+    window.location.href = '/usuarios/';
+});
