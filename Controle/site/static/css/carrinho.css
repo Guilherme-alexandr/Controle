@@ -1,0 +1,136 @@
+:root {
+    --verde-oliva-escuro: #606C38;
+    --verde-escuro: #283618;
+    --creme-claro: #FEFAE0;
+    --amarelo-mostarda: #DDA15E;
+    --marrom: #BC6C25;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--creme-claro);
+    color: var(--verde-escuro);
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: var(--verde-oliva-escuro);
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+h2 {
+    color: var(--verde-oliva-escuro);
+    text-align: center;
+}
+
+button {
+    background-color: var(--marrom);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--amarelo-mostarda);
+}
+
+#voltar {
+    background-color: var(--verde-escuro);
+    margin-right: 20px;
+}
+
+#voltar:hover {
+    background-color: var(--verde-oliva-escuro);
+}
+
+#finalizarCompraBtn {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    background-color: var(--marrom);
+    padding: 10px;
+}
+
+#finalizarCompraBtn:hover {
+    background-color: var(--amarelo-mostarda);
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: var(--creme-claro);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--verde-escuro);
+}
+
+th {
+    background-color: var(--verde-escuro);
+    color: white;
+}
+
+td {
+    background-color: var(--creme-claro);
+}
+
+input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid var(--verde-escuro);
+}
+
+input[type="number"]:focus {
+    border-color: var(--marrom);
+}
+
+.btn-remove {
+    background-color: var(--amarelo-mostarda);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-remove:hover {
+    background-color: red;
+}
+
+#totalCarrinho {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--verde-oliva-escuro);
+}
+
+@media screen and (max-width: 600px) {
+    table {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+}

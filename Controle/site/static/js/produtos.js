@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${produto.descricao}</td>
                     <td>${produto.quantidade}</td>
                     <td>
-                      <button onclick="mostrarFormularioAtualizar(${produto.id}, '${produto.nome}', '${produto.valor}', '${produto.tipo}', '${produto.descricao}', '${produto.quantidade}')">Atualizar</button>
-                      <button onclick="deletarProduto(${produto.id})">Deletar</button>
+                      <button class="btn-update" onclick="mostrarFormularioAtualizar(${produto.id}, '${produto.nome}', '${produto.valor}', '${produto.tipo}', '${produto.descricao}', '${produto.quantidade}')">Atualizar</button>
+                      <button class="btn-delete" onclick="deletarProduto(${produto.id})">Deletar</button>
                     </td>
                 `;
             tbody.appendChild(tr);

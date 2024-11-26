@@ -1,72 +1,67 @@
-document.addEventListener('DOMContentLoaded', function () {
-
-    fetch('/produtos/listar')
-        .then(response => response.json())
-        .then(data => {
-            const produtos = data.produtos;
-            const tabela = document.querySelector('#produtosTabela tbody');
-
-            produtos.forEach(produto => {
-                const row = document.createElement('tr');
-
-                const nomeCell = document.createElement('td');
-                nomeCell.textContent = produto.nome;
-                row.appendChild(nomeCell);
-
-                const valorCell = document.createElement('td');
-                valorCell.textContent = produto.valor;
-                row.appendChild(valorCell);
-
-                const descricaoCell = document.createElement('td');
-                descricaoCell.textContent = produto.descricao;
-                row.appendChild(descricaoCell);
-
-                const quantidadeCell = document.createElement('td');
-                const quantidadeInput = document.createElement('input');
-                quantidadeInput.type = 'number';
-                quantidadeInput.value = 1;
-                quantidadeInput.min = 1;
-                quantidadeCell.appendChild(quantidadeInput);
-                row.appendChild(quantidadeCell);
-
-                const acaoCell = document.createElement('td');
-                const addButton = document.createElement('button');
-                addButton.textContent = 'Adicionar ao Carrinho';
-                addButton.addEventListener('click', function () {
-                    adicionarAoCarrinho(produto, quantidadeInput.value);
-                });
-                acaoCell.appendChild(addButton);
-                row.appendChild(acaoCell);
-
-                tabela.appendChild(row);
-            });
+function listarProdutos() {
+    fetch('/produtos/listar', { method: 'GET' })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Erro na resposta da requisição:', response.statusText);
+                return Promise.reject('Erro na requisição');
+            }
+            return response.json();
         })
-        .catch(error => {
-            console.error('Erro ao listar produtos:', error);
-        });
-});
+        .then(data => {
+            console.log(data);
+            if (data.produtos) {
+                const tbody = document.querySelector('#produtosTabela tbody');
+                tbody.innerHTML = '';
 
-function adicionarAoCarrinho(produto, quantidade) {
+                data.produtos.forEach(produto => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${produto.nome}</td>
+                        <td>${produto.valor}</td>
+                        <td>${produto.descricao}</td>
+                        <td><input type="number" class="quantidadeInput" value="1" min="1" data-produto-id="${produto.id}"></td>
+                        <td>
+                            <button class="btn-add" 
+                                    onclick="adicionarAoCarrinho(${produto.id}, '${produto.nome}', '${produto.valor}')">
+                                Adicionar ao Carrinho
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                console.error('Erro ao carregar produtos:', data.error);
+            }
+        })
+        .catch(error => console.error('Erro ao listar produtos:', error));
+}
+
+function adicionarAoCarrinho(produtoId, nome, valor) {
     let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+    const quantidadeInput = document.querySelector(`input[data-produto-id="${produtoId}"]`);
+    const quantidade = parseInt(quantidadeInput.value);
+
+    if (quantidade < 1) {
+        alert('A quantidade mínima é 1');
+        return;
+    }
+    const produto = {
+        id: produtoId,
+        nome: nome,
+        valor: parseFloat(valor),
+        quantidade: quantidade
+    };
 
     const produtoExistente = carrinho.find(item => item.id === produto.id);
     if (produtoExistente) {
-        produtoExistente.quantidade += parseInt(quantidade);
+        produtoExistente.quantidade += produto.quantidade;
     } else {
-        carrinho.push({
-            id: produto.id,
-            nome: produto.nome,
-            valor: parseFloat(produto.valor),
-            quantidade: parseInt(quantidade)
-        });
+        carrinho.push(produto);
     }
 
     localStorage.setItem('carrinho', JSON.stringify(carrinho));
     alert('Produto adicionado ao carrinho com sucesso!');
 }
 
-document.getElementById('logoutBtn').addEventListener('click', function() {
-
-    sessionStorage.clear();
-    window.location.href = '/usuarios/';
-});
+document.addEventListener('DOMContentLoaded', listarProdutos);
