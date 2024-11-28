@@ -1,8 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    listarCarrinho();
-    document.querySelector('#finalizarCompraBtn').addEventListener('click', finalizarCompra);
-    document.getElementById('voltar').addEventListener('click', voltarPaginaCliente);
-});
+listarCarrinho();
 
 function listarCarrinho() {
     let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
@@ -64,13 +60,54 @@ function removerProduto(index) {
     listarCarrinho();
 }
 
-function finalizarCompra() {
-    alert('Compra finalizada com sucesso!');
-    localStorage.removeItem('carrinho');
-    window.location.href = '/cliente';
+function realizarPedido() {
+    let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    let nomePedido = document.getElementById('nomePedido').value.trim();
+
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
+    }
+
+    if (nomePedido === "") {
+        alert("Por favor, adicione um nome ao pedido.");
+        return;
+    }
+
+    let produtoIds = carrinho.map(item => item.id);
+
+    fetch('/cliente/realizar_pedido', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            produtos: produtoIds,
+            nomePedido: nomePedido
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.error || 'Erro ao processar o pedido.'); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert("Pedido realizado com sucesso!");
+            localStorage.removeItem('carrinho');
+            window.location.href = '/cliente/pedidos';
+        } else {
+            alert(data.error || "Erro ao realizar o pedido. Tente novamente.");
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao realizar o pedido:', error);
+        alert(error.message || "Erro inesperado. Tente novamente.");
+    });
 }
 
-function voltarPaginaCliente() {
+document.getElementById('voltarbtn').addEventListener('click', function () {
     sessionStorage.clear();
     window.location.href = '/cliente/';
-}
+});

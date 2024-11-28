@@ -7,14 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
 </head>
 <body>
-
-    <!-- Header com título e botão de sair -->
     <div id="header">
         <h1>Lista de Produtos</h1>
-        <button id="logoutBtn" class="btn-logout">Sair</button>
+        <button id="logoutBtn" class="btn-logout" >Sair</button>
     </div>
-
-    <!-- Tabela de produtos -->
     <div id="produtosContainer">
         <table id="produtosTabela">
             <thead>
@@ -27,13 +23,12 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Conteúdo será inserido dinamicamente -->
+                
             </tbody>
         </table>
     </div>
 
-    <!-- Botão para visualizar o carrinho -->
-    <button id="verCarrinhoBtn" onclick="window.location.href='/cliente/carrinho'" class="btn-carrinho">Ver Carrinho</button>
+    <button id="CarrinhoBtn" class="btn-carrinho">Ver Carrinho</button>
 
     <script src="/static/js/cliente.js"></script>
 </body>

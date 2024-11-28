@@ -7,69 +7,59 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: var(--creme-claro);
-    color: var(--verde-escuro);
     margin: 0;
     padding: 0;
-}
-
-h1 {
-    color: var(--verde-oliva-escuro);
-    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    background-color: var(--verde-oliva-escuro);
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 0 20px;
+    height: 100vh;
 }
 
-h2 {
-    color: var(--verde-oliva-escuro);
+#carrinhoContainer {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--creme-claro);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
+h2 {
+    color: var(--verde-escuro);
+}
+
 button {
-    background-color: var(--marrom);
-    color: white;
-    padding: 10px 20px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    color: var(--creme-claro);
 }
 
 button:hover {
-    background-color: var(--amarelo-mostarda);
+    opacity: 0.9;
 }
 
-#voltar {
+.botao {
     background-color: var(--verde-escuro);
-    margin-right: 20px;
+    margin-bottom: 15px;
 }
 
-#voltar:hover {
-    background-color: var(--verde-oliva-escuro);
-}
-
-#finalizarCompraBtn {
-    display: block;
-    width: 200px;
-    margin: 20px auto;
-    background-color: var(--marrom);
-    padding: 10px;
-}
-
-#finalizarCompraBtn:hover {
+.btn-finalizar {
     background-color: var(--amarelo-mostarda);
+    margin-top: 15px;
+    width: 100%;
 }
 
 table {
-    width: 80%;
-    margin: 20px auto;
+    width: 100%;
+    margin-bottom: 20px;
     border-collapse: collapse;
     background-color: var(--creme-claro);
     border-radius: 10px;
-    overflow: hidden;
 }
 
 th,
@@ -107,11 +97,10 @@ input[type="number"]:focus {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
 .btn-remove:hover {
-    background-color: red;
+    background-color: var(--marrom);
 }
 
 #totalCarrinho {
@@ -120,17 +109,8 @@ input[type="number"]:focus {
     color: var(--verde-oliva-escuro);
 }
 
-@media screen and (max-width: 600px) {
-    table {
-        width: 100%;
-    }
-
-    button {
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    h2 {
-        font-size: 18px;
+@media (max-width: 768px) {
+    #carrinhoContainer {
+        width: 90%;
     }
 }

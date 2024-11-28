@@ -31,11 +31,11 @@ class Pedido(Base):
     __tablename__ = 'pedidos'
 
     id = Column(Integer, primary_key=True, index=True)
-    cliente_id = Column(Integer, ForeignKey('usuarios.id'))
+    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
     status = Column(String(50), default='pendente')
+    nome_pedido = Column(String(255))
 
     usuario = relationship('Usuario', back_populates='pedidos')
-
     produtos = relationship('PedidoProduto', back_populates='pedido')
 
 

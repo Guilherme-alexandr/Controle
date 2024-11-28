@@ -7,26 +7,30 @@
     <link rel="stylesheet" href="/static/css/carrinho.css">
 </head>
 <body>
-    <h1>Meu Carrinho</h1>  <button id="voltar">Voltar</button>
-    <table border="1" id="carrinhoTabela">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Valor Unitário (R$)</th>
-                <th>Quantidade</th>
-                <th>Valor Total (R$)</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
+    <div id="carrinhoContainer">
+        <h2>Meu Carrinho</h2>
+        <button id="voltarbtn" class="botao" >Voltar</button>
+        <input type="text" id="nomePedido" placeholder="Nome do Pedido">
 
-    <h2>Total: R$ <span id="totalCarrinho">0.00</span></h2>
+        <table id="carrinhoTabela">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Valor Unitário (R$)</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total (R$)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
 
-    
-    <button id="finalizarCompraBtn">Finalizar Compra</button>
+        <h2>Total: R$ <span id="totalCarrinho">0.00</span></h2>
+
+        <button id="realizarPedidoBtn" class="botao" onclick="realizarPedido()" >Realizar Pedido</button>
+    </div>
 
     <script src="/static/js/carrinho.js"></script>
 </body>
