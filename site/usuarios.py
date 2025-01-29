@@ -41,7 +41,7 @@ def login_usuario():
         if usuario and check_password_hash(usuario.senha, data['senha']):
             session['cliente_id'] = usuario.id
             if usuario.tipo == 'admin':
-                return jsonify({'redirect_url': '/produtos'})
+                return jsonify({'redirect_url': '/admin'})
             elif usuario.tipo == 'cliente':
                 return jsonify({'redirect_url': '/cliente'})
         else:

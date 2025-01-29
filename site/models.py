@@ -23,7 +23,7 @@ class Usuario(Base):
     email = Column(String(255), nullable=False, unique=True)
     senha = Column(String(255), nullable=False)
     tipo = Column(String(50), nullable=False, default="cliente")
-
+    
     pedidos = relationship('Pedido', back_populates='usuario')
 
 
