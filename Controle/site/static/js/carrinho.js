@@ -74,7 +74,10 @@ function realizarPedido() {
         return;
     }
 
-    let produtoIds = carrinho.map(item => item.id);
+    let produtos = carrinho.map(item => ({
+        id: item.id,
+        quantidade: item.quantidade
+    }));
 
     fetch('/cliente/realizar_pedido', {
         method: 'POST',
@@ -82,7 +85,7 @@ function realizarPedido() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-            produtos: produtoIds,
+            produtos: produtos,
             nomePedido: nomePedido
         })
     })
@@ -106,6 +109,7 @@ function realizarPedido() {
         alert(error.message || "Erro inesperado. Tente novamente.");
     });
 }
+
 
 document.getElementById('voltarbtn').addEventListener('click', function () {
     sessionStorage.clear();

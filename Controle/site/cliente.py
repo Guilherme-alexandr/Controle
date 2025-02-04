@@ -16,7 +16,6 @@ def ver_carrinho():
 def ver_pedidos():
     return render_template('pedidos.html')
 
-# realizar pedido
 @cliente_bp.route('/realizar_pedido', methods=['POST'])
 def realizar_pedido():
     try:
@@ -36,11 +35,19 @@ def realizar_pedido():
         novo_pedido = Pedido(usuario_id=cliente_id, status='pendente', nome_pedido=nome_pedido)
         session_db.add(novo_pedido)
         session_db.commit()
-        for produto_id in produtos:
+
+        for item in produtos:
+            produto_id = item['id']
+            quantidade = item.get('quantidade', 1)
+
             produto = session_db.query(Produto).filter(Produto.id == produto_id).first()
             if produto:
-                pedido_produto = PedidoProduto(pedido_id=novo_pedido.id, produto_id=produto.id)
-                session_db.add(pedido_produto)
+                if produto.quantidade >= quantidade:
+                    pedido_produto = PedidoProduto(pedido_id=novo_pedido.id, produto_id=produto.id, quantidade=quantidade)
+                    session_db.add(pedido_produto)
+                    produto.quantidade -= quantidade
+                else:
+                    return jsonify({'success': False, 'error': f'Estoque insuficiente para o produto {produto_id}.'}), 400
             else:
                 return jsonify({'success': False, 'error': f'Produto com ID {produto_id} não encontrado.'}), 404
 
@@ -55,7 +62,7 @@ def realizar_pedido():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-# Listar
+
 @cliente_bp.route('/pedidos/listar', methods=['GET'])
 def listar_pedidos():
     try:
@@ -82,69 +89,104 @@ def listar_pedidos():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-# Realizar pagamento 
-@cliente_bp.route('/realizar-pagamento/<int:pedido_id>', methods=['POST'])
+@cliente_bp.route('/pedidos/produtos/<int:pedido_id>', methods=['GET'])
+def ver_produtos(pedido_id):
+    try:
+        usuario_id = session.get('cliente_id')
+        if not usuario_id:
+            return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
+
+        pedido = SessionLocal().query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == usuario_id).first()
+        if not pedido:
+            return jsonify({'success': False, 'error': 'Pedido não encontrado ou não pertence ao cliente.'}), 404
+
+        produtos = []
+        for pedido_produto in pedido.produtos:
+            produto = SessionLocal().query(Produto).filter(Produto.id == pedido_produto.produto_id).first()
+            if produto:
+                produtos.append({
+                    'nome': produto.nome,
+                    'quantidade': pedido_produto.quantidade,
+                    'valor': produto.valor
+                })
+        
+        return jsonify({'success': True, 'produtos': produtos}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@cliente_bp.route('/pedidos/pagar/<int:pedido_id>', methods=['POST'])
 def realizar_pagamento(pedido_id):
-    cliente_id = session.get('cliente_id')
+    try:
+        usuario_id = session.get('cliente_id')
+        if not usuario_id:
+            return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
 
-    if not cliente_id:
-        return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
+        session_db = SessionLocal()
+        pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == usuario_id).first()
+        if not pedido:
+            session_db.close()
+            return jsonify({'success': False, 'error': 'Pedido não encontrado ou não pertence ao cliente.'}), 404
 
-    session_db = SessionLocal()
-    pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == cliente_id).first()
+        pedido.status = 'pago'
+        session_db.commit()
+        session_db.close()
 
-    if not pedido:
-        return jsonify({'success': False, 'error': 'Pedido não encontrado.'}), 404
+        return jsonify({'success': True, 'message': 'Pagamento realizado com sucesso!'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-    if pedido.status != 'pendente':
-        return jsonify({'success': False, 'error': 'Este pedido já foi pago ou cancelado.'}), 400
-
-    pedido.status = 'pago'
-    session_db.commit()
-    session_db.close()
-
-    return jsonify({'success': True, 'message': 'Pagamento realizado com sucesso.'})
-
-#atualizar nome do pedido
-@cliente_bp.route('/atualizar-nome-pedido/<int:pedido_id>', methods=['POST'])
-def atualizar_nome_pedido(pedido_id):
-    novo_nome = request.json.get('nome_pedido')
-    cliente_id = session.get('cliente_id')
-
-    if not cliente_id:
-        return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
-
-    session_db = SessionLocal()
-    pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == cliente_id).first()
-
-    if not pedido:
-        return jsonify({'success': False, 'error': 'Pedido não encontrado.'}), 404
-
-    pedido.nome_pedido = novo_nome
-    session_db.commit()
-    session_db.close()
-
-    return jsonify({'success': True, 'message': 'Nome do pedido atualizado com sucesso.'})
-
-#Cancelar pedido 
-@cliente_bp.route('/cancelar-pedido/<int:pedido_id>', methods=['POST'])
+@cliente_bp.route('/pedidos/cancelar/<int:pedido_id>', methods=['POST'])
 def cancelar_pedido(pedido_id):
-    cliente_id = session.get('cliente_id')
+    try:
+        cliente_id = session.get('cliente_id')
+        if not cliente_id:
+            return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
 
-    if not cliente_id:
-        return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
+        session_db = SessionLocal()
+        pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == cliente_id).first()
 
-    session_db = SessionLocal()
-    pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == cliente_id).first()
+        if not pedido:
+            return jsonify({'success': False, 'error': 'Pedido não encontrado.'}), 404
+        if pedido.status != 'pendente':
+            return jsonify({'success': False, 'error': 'Este pedido já foi pago ou não pode ser cancelado.'}), 400
+       
+        for pedido_produto in pedido.produtos:
+            produto = session_db.query(Produto).filter(Produto.id == pedido_produto.produto_id).first()
+            if produto:
+                produto.quantidade += 1
 
-    if not pedido:
-        return jsonify({'success': False, 'error': 'Pedido não encontrado.'}), 404
+        pedido.status = 'cancelado'
+        session_db.commit()
+        session_db.close()
 
-    if pedido.status != 'pendente':
-        return jsonify({'success': False, 'error': 'Este pedido já foi pago ou cancelado.'}), 400
+        return jsonify({'success': True, 'message': 'Pedido cancelado com sucesso!'}), 200
 
-    pedido.status = 'cancelado'
-    session_db.commit()
-    session_db.close()
+    except Exception as e:
+        session_db.rollback()
+        session_db.close()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
+@cliente_bp.route('/pedidos/apagar/<int:pedido_id>', methods=['DELETE'])
+def apagar_pedido(pedido_id):
+    try:
+        cliente_id = session.get('cliente_id')
+        if not cliente_id:
+            return jsonify({'success': False, 'error': 'Cliente não autenticado.'}), 401
 
-    return jsonify({'success': True, 'message': 'Pedido cancelado com sucesso.'})
+        session_db = SessionLocal()
+
+        pedido = session_db.query(Pedido).filter(Pedido.id == pedido_id, Pedido.usuario_id == cliente_id).first()
+        if not pedido:
+            return jsonify({'success': False, 'error': 'Pedido não encontrado.'}), 404
+
+        session_db.delete(pedido)
+        session_db.commit()
+        session_db.close()
+
+        return jsonify({'success': True, 'message': 'Pedido apagado com sucesso!'}), 200
+    except Exception as e:
+        session_db.rollback()
+        session_db.close()
+        return jsonify({'success': False, 'error': str(e)}), 500
+

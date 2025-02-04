@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => {
             if (response.ok) {
-                return response.json();            
+                return response.json();         
             } else {
                 throw new Error('Erro ao fazer login');
             }

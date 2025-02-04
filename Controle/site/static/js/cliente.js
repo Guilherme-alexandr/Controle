@@ -72,8 +72,12 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
 
 document.getElementById('CarrinhoBtn').addEventListener('click', function () {
 
-    sessionStorage.clear();
     window.location.href='/cliente/carrinho';
+});
+
+document.getElementById('PedidosBtn').addEventListener('click', function () {
+
+    window.location.href='/cliente/pedidos';
 });
 
 document.addEventListener('DOMContentLoaded', listarProdutos);

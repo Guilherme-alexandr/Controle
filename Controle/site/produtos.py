@@ -5,9 +5,9 @@ from models import Produto
 produtos_bp = Blueprint('produtos', __name__)
 app = Flask(__name__)
 
-@produtos_bp.route('/')
+@produtos_bp.route('/produtos')
 def produtos():
-    return render_template('produtos.html')
+    return render_template('admin_produtos.html')
 
 
 @produtos_bp.route('/', methods=['POST'])

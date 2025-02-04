@@ -23,7 +23,7 @@ class Usuario(Base):
     email = Column(String(255), nullable=False, unique=True)
     senha = Column(String(255), nullable=False)
     tipo = Column(String(50), nullable=False, default="cliente")
-
+    
     pedidos = relationship('Pedido', back_populates='usuario')
 
 
@@ -45,6 +45,7 @@ class PedidoProduto(Base):
     id = Column(Integer, primary_key=True, index=True)
     pedido_id = Column(Integer, ForeignKey('pedidos.id'))
     produto_id = Column(Integer, ForeignKey('produtos.id'))
+    quantidade = Column(Integer, nullable=False, default=1)
 
     pedido = relationship('Pedido', back_populates='produtos')
     produto = relationship('Produto', back_populates='pedidos')
